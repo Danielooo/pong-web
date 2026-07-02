@@ -58,8 +58,8 @@ export default function App() {
         </div>
       </div>
 
-      <main className="game-shell flex min-h-[100dvh] flex-col items-center justify-center gap-3 py-3 landscape:gap-2 landscape:py-2">
-        <div className="game-layout flex w-full max-w-[100vw] items-center justify-center">
+      <main className="game-shell flex min-h-[100dvh] flex-col items-center justify-center gap-3 py-3 select-none landscape:gap-2 landscape:py-2">
+        <div className="game-layout flex w-full max-w-[100vw] items-stretch justify-center">
           {isPlaying && (
             <MobilePlayerControls
               player={1}
