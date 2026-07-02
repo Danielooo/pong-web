@@ -1,0 +1,22 @@
+---
+description: Game loop and physics architecture
+globs: src/game/**
+alwaysApply: false
+---
+
+# Game Architecture
+
+- Physics is pure: `tick(state, inputs) → newState` with no side effects or DOM access
+- `GameEngine` owns the rAF loop lifecycle; components subscribe via hooks only
+- Collision uses AABB; ball angle varies by hit offset from paddle center
+- Win condition is checked inside `tick`; engine transitions to `gameover` status
+- Serve countdown and pause are engine responsibilities, not physics
+- Reset and start flow goes through `GameEngine`, not React state inside the loop
+
+```typescript
+// ✅ GOOD — pure tick
+export function tick(state: GameState, inputs: Inputs): GameState { ... }
+
+// ❌ BAD — physics coupled to canvas
+export function tick(ctx: CanvasRenderingContext2D, ...) { ... }
+```

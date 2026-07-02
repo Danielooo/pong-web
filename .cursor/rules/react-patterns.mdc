@@ -1,0 +1,21 @@
+---
+description: React component and hook patterns
+globs: src/**/*.tsx
+alwaysApply: false
+---
+
+# React Patterns
+
+- Functional components and hooks only
+- React state covers UI phases: menu, playing, gameover overlay
+- Input listeners live in `useGameInput` with cleanup in `useEffect`
+- Never call `setState` inside the rAF loop; engine uses callbacks for score updates
+- Stabilize hook return values with `useCallback` to avoid effect churn
+
+```tsx
+// ✅ GOOD — UI shell only
+const [phase, setPhase] = useState<'menu' | 'playing'>('menu')
+
+// ❌ BAD — paddle position in React state
+const [paddleY, setPaddleY] = useState(0)
+```

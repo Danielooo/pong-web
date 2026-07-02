@@ -1,0 +1,20 @@
+---
+description: Canvas rendering conventions
+globs: src/game/renderer.ts,src/components/GameCanvas.tsx
+alwaysApply: false
+---
+
+# Canvas Rendering
+
+- `renderer.ts` is draw-only: receives `CanvasRenderingContext2D` + `GameState`, no mutations
+- Scale canvas for device pixel ratio in the hook, not in the renderer
+- All drawing happens in one `render()` call per frame
+- React must not re-render the canvas each frame; the engine calls `render()` via rAF
+
+```typescript
+// ✅ GOOD
+export function render(ctx: CanvasRenderingContext2D, state: GameState): void
+
+// ❌ BAD — game logic in renderer
+if (ball.x > paddle.x) { state.scores[0]++ }
+```

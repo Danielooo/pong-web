@@ -1,0 +1,12 @@
+---
+description: Core coding standards for the Pong project
+alwaysApply: true
+---
+
+# Project Core
+
+- TypeScript strict mode; never use `any`
+- Game logic lives in `src/game/`; never inline physics in React components
+- Named exports; one component or module per file
+- Constants belong in `src/game/constants.ts`; no magic numbers elsewhere
+- Do not create git commits unless explicitly requested
