@@ -4,11 +4,15 @@ import {
   BALL_SPEED_INCREASE,
   CANVAS_HEIGHT,
   CANVAS_WIDTH,
+  LEFT_PADDLE_X_MAX,
+  LEFT_PADDLE_X_MIN,
   MAX_BALL_SPEED,
   PADDLE_HEIGHT,
   PADDLE_MARGIN,
   PADDLE_SPEED,
   PADDLE_WIDTH,
+  RIGHT_PADDLE_X_MAX,
+  RIGHT_PADDLE_X_MIN,
   SERVE_COUNTDOWN_SECONDS,
   WIN_SCORE,
 } from './constants'
@@ -51,21 +55,40 @@ export function launchBall(): Ball {
   }
 }
 
-function movePaddle(paddle: Paddle, input: Inputs['player1']): Paddle {
-  let nextY = paddle.y
-  if (input === 'up') nextY -= PADDLE_SPEED
-  if (input === 'down') nextY += PADDLE_SPEED
+function movePaddle(
+  paddle: Paddle,
+  side: 'left' | 'right',
+  input: Inputs['player1'],
+): Paddle {
+  let dx = 0
+  let dy = 0
+  if (input.vertical === 'up') dy -= PADDLE_SPEED
+  if (input.vertical === 'down') dy += PADDLE_SPEED
+  if (input.horizontal === 'left') dx -= PADDLE_SPEED
+  if (input.horizontal === 'right') dx += PADDLE_SPEED
 
+  if (dx !== 0 && dy !== 0) {
+    dx *= Math.SQRT1_2
+    dy *= Math.SQRT1_2
+  }
+
+  const minX = side === 'left' ? LEFT_PADDLE_X_MIN : RIGHT_PADDLE_X_MIN
+  const maxX = side === 'left' ? LEFT_PADDLE_X_MAX : RIGHT_PADDLE_X_MAX
   const maxY = CANVAS_HEIGHT - PADDLE_HEIGHT
-  return { ...paddle, y: Math.max(0, Math.min(maxY, nextY)) }
+
+  return {
+    ...paddle,
+    x: Math.max(minX, Math.min(maxX, paddle.x + dx)),
+    y: Math.max(0, Math.min(maxY, paddle.y + dy)),
+  }
 }
 
 export function tickPaddles(state: GameState, inputs: Inputs): GameState {
   return {
     ...state,
     paddles: [
-      movePaddle(state.paddles[0], inputs.player1),
-      movePaddle(state.paddles[1], inputs.player2),
+      movePaddle(state.paddles[0], 'left', inputs.player1),
+      movePaddle(state.paddles[1], 'right', inputs.player2),
     ],
   }
 }
@@ -160,8 +183,8 @@ export function tick(state: GameState, inputs: Inputs): GameState {
   if (state.status !== 'playing') return state
 
   const paddles: [Paddle, Paddle] = [
-    movePaddle(state.paddles[0], inputs.player1),
-    movePaddle(state.paddles[1], inputs.player2),
+    movePaddle(state.paddles[0], 'left', inputs.player1),
+    movePaddle(state.paddles[1], 'right', inputs.player2),
   ]
 
   let ball = moveBall(state.ball)

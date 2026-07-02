@@ -19,6 +19,12 @@ export function StartScreen({ onStart }: StartScreenProps) {
           <p className="mt-1">
             <kbd className="rounded bg-neutral-800 px-2 py-1">S</kbd> down
           </p>
+          <p className="mt-1">
+            <kbd className="rounded bg-neutral-800 px-2 py-1">A</kbd> left
+          </p>
+          <p className="mt-1">
+            <kbd className="rounded bg-neutral-800 px-2 py-1">D</kbd> right
+          </p>
         </div>
         <div className="rounded-lg border border-neutral-800 bg-neutral-900/50 px-6 py-4">
           <p className="mb-2 font-semibold text-white">Player 2 (right)</p>
@@ -27,6 +33,12 @@ export function StartScreen({ onStart }: StartScreenProps) {
           </p>
           <p className="mt-1">
             <kbd className="rounded bg-neutral-800 px-2 py-1">↓</kbd> down
+          </p>
+          <p className="mt-1">
+            <kbd className="rounded bg-neutral-800 px-2 py-1">←</kbd> left
+          </p>
+          <p className="mt-1">
+            <kbd className="rounded bg-neutral-800 px-2 py-1">→</kbd> right
           </p>
         </div>
       </div>
