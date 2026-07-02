@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { FullscreenMode } from '../utils/fullscreen'
 import {
+  canHideBrowserChrome,
+  isStandaloneDisplayMode,
+} from '../utils/displayMode'
+import {
   exitNativeFullscreen,
   isNativeFullscreenActive,
   isNativeFullscreenSupported,
@@ -12,14 +16,21 @@ type UseFullscreenResult = {
   isFullscreen: boolean
   mode: FullscreenMode
   canUseNativeFullscreen: boolean
+  showInstallHint: boolean
+  dismissInstallHint: () => void
   toggleFullscreen: () => Promise<void>
 }
 
 export function useFullscreen(
   targetRef: RefObject<HTMLElement | null>,
 ): UseFullscreenResult {
-  const [mode, setMode] = useState<FullscreenMode>('none')
-  const modeRef = useRef<FullscreenMode>('none')
+  const [mode, setMode] = useState<FullscreenMode>(() =>
+    isStandaloneDisplayMode() ? 'fallback' : 'none',
+  )
+  const [showInstallHint, setShowInstallHint] = useState(false)
+  const modeRef = useRef<FullscreenMode>(
+    isStandaloneDisplayMode() ? 'fallback' : 'none',
+  )
 
   const syncNativeState = useCallback(() => {
     if (modeRef.current !== 'fallback' && isNativeFullscreenActive()) {
@@ -57,16 +68,24 @@ export function useFullscreen(
     if (!target) return
 
     if (isNativeFullscreenSupported()) {
-      const entered = await requestNativeFullscreen(target)
+      const entered =
+        (await requestNativeFullscreen(document.documentElement)) ||
+        (await requestNativeFullscreen(target))
       if (entered) {
         modeRef.current = 'native'
         setMode('native')
+        if (!canHideBrowserChrome()) {
+          setShowInstallHint(true)
+        }
         return
       }
     }
 
     modeRef.current = 'fallback'
     setMode('fallback')
+    if (!canHideBrowserChrome()) {
+      setShowInstallHint(true)
+    }
   }, [targetRef])
 
   const exitFullscreen = useCallback(async () => {
@@ -74,11 +93,15 @@ export function useFullscreen(
       await exitNativeFullscreen()
     }
 
-    modeRef.current = 'none'
-    setMode('none')
+    if (!isStandaloneDisplayMode()) {
+      modeRef.current = 'none'
+      setMode('none')
+    }
   }, [])
 
   const toggleFullscreen = useCallback(async () => {
+    if (isStandaloneDisplayMode()) return
+
     if (modeRef.current === 'none') {
       await enterFullscreen()
       return
@@ -87,10 +110,19 @@ export function useFullscreen(
     await exitFullscreen()
   }, [enterFullscreen, exitFullscreen])
 
+  const dismissInstallHint = useCallback(() => {
+    setShowInstallHint(false)
+  }, [])
+
+  const isFullscreen =
+    mode !== 'none' || isStandaloneDisplayMode()
+
   return {
-    isFullscreen: mode !== 'none',
-    mode,
+    isFullscreen,
+    mode: isStandaloneDisplayMode() ? 'fallback' : mode,
     canUseNativeFullscreen: isNativeFullscreenSupported(),
+    showInstallHint,
+    dismissInstallHint,
     toggleFullscreen,
   }
 }
