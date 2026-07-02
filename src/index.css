@@ -8,10 +8,35 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   touch-action: manipulation;
   overscroll-behavior: none;
+  -webkit-touch-callout: none;
 }
 
 #root {
   min-height: 100dvh;
+}
+
+.game-shell {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.game-shell.is-fallback-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  min-height: 100dvh;
+  min-width: 100vw;
+  width: 100vw;
+  background-color: #0a0a0a;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.fullscreen-button-wrap {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
 }
 
 .game-layout {
@@ -22,7 +47,7 @@ body {
 
 @media (orientation: landscape) {
   .game-layout {
-    gap: 2rem;
+    gap: 1.75rem;
     padding-left: max(1.75rem, env(safe-area-inset-left, 0px));
     padding-right: max(1.75rem, env(safe-area-inset-right, 0px));
   }
@@ -30,6 +55,20 @@ body {
 
 .touch-controls {
   display: flex;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.mobile-paddle-button {
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  appearance: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -50,6 +89,6 @@ body {
 
 @media (orientation: landscape) and (max-height: 500px) {
   .game-layout {
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 }

@@ -17,12 +17,14 @@ type ArrowButtonProps = {
 function ArrowButton({ label, direction, onPress, disabled }: ArrowButtonProps) {
   const handlePointerDown = (event: PointerEvent<HTMLButtonElement>) => {
     event.preventDefault()
+    event.stopPropagation()
     event.currentTarget.setPointerCapture(event.pointerId)
     onPress(direction)
   }
 
   const handlePointerUp = (event: PointerEvent<HTMLButtonElement>) => {
     event.preventDefault()
+    event.stopPropagation()
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
@@ -37,8 +39,8 @@ function ArrowButton({ label, direction, onPress, disabled }: ArrowButtonProps) 
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      onPointerLeave={handlePointerUp}
-      className="flex h-[4.75rem] w-[4.75rem] items-center justify-center rounded-full border-2 border-neutral-500/80 bg-neutral-900/90 text-4xl text-white shadow-xl backdrop-blur-sm transition active:scale-95 active:bg-neutral-700 disabled:opacity-40 landscape:h-20 landscape:w-20 landscape:text-[2.5rem] touch-none select-none"
+      onContextMenu={(event) => event.preventDefault()}
+      className="mobile-paddle-button flex min-h-[7rem] w-full flex-1 items-center justify-center rounded-[2rem] border-2 border-neutral-500/80 bg-neutral-900/95 text-[3.25rem] leading-none text-white shadow-xl transition active:bg-neutral-700 disabled:opacity-40 landscape:min-h-[7.5rem] landscape:rounded-[2.25rem] landscape:text-[3.5rem]"
     >
       {direction === 'up' ? '↑' : '↓'}
     </button>
@@ -54,22 +56,27 @@ export function MobilePlayerControls({
     onTouchInput(player, input)
   }
 
+  const blockTouch = (event: PointerEvent<HTMLDivElement>) => {
+    event.preventDefault()
+  }
+
   return (
-    <div className="touch-controls flex w-[5.5rem] shrink-0 flex-col items-center justify-center landscape:w-[6.5rem]">
-      <div className="flex flex-col gap-8 landscape:gap-10">
-        <ArrowButton
-          label={`Player ${player} move up`}
-          direction="up"
-          onPress={handlePress}
-          disabled={disabled}
-        />
-        <ArrowButton
-          label={`Player ${player} move down`}
-          direction="down"
-          onPress={handlePress}
-          disabled={disabled}
-        />
-      </div>
+    <div
+      className="touch-controls flex w-[8rem] shrink-0 flex-col self-stretch gap-5 py-1 landscape:w-[8.5rem] landscape:gap-6 landscape:py-2"
+      onContextMenu={blockTouch}
+    >
+      <ArrowButton
+        label={`Player ${player} move up`}
+        direction="up"
+        onPress={handlePress}
+        disabled={disabled}
+      />
+      <ArrowButton
+        label={`Player ${player} move down`}
+        direction="down"
+        onPress={handlePress}
+        disabled={disabled}
+      />
     </div>
   )
 }

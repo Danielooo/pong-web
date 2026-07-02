@@ -1,9 +1,11 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { FullscreenButton } from './components/FullscreenButton'
 import { GameCanvas } from './components/GameCanvas'
 import { GameControls } from './components/GameControls'
 import { MobilePlayerControls } from './components/MobileControls'
 import { ScoreBoard } from './components/ScoreBoard'
 import { StartScreen } from './components/StartScreen'
+import { useFullscreen } from './hooks/useFullscreen'
 import { useGameInput } from './hooks/useGameInput'
 import { useGameLoop } from './hooks/useGameLoop'
 import { useGameShortcuts } from './hooks/useGameShortcuts'
@@ -13,9 +15,12 @@ type AppPhase = 'menu' | 'playing'
 
 export default function App() {
   const [phase, setPhase] = useState<AppPhase>('menu')
+  const fullscreenTargetRef = useRef<HTMLElement>(null)
   const { getInputs, setTouchInput } = useGameInput()
   const { canvasRef, containerRef, state, restart, togglePause, backToMenu } =
     useGameLoop(getInputs, phase === 'playing')
+  const { isFullscreen, mode, toggleFullscreen } =
+    useFullscreen(fullscreenTargetRef)
 
   const handleBackToMenu = useCallback(() => {
     backToMenu()
@@ -58,8 +63,22 @@ export default function App() {
         </div>
       </div>
 
-      <main className="game-shell flex min-h-[100dvh] flex-col items-center justify-center gap-3 py-3 landscape:gap-2 landscape:py-2">
-        <div className="game-layout flex w-full max-w-[100vw] items-center justify-center">
+      <main
+        ref={fullscreenTargetRef}
+        className={`game-shell relative flex min-h-[100dvh] flex-col items-center justify-center gap-3 py-3 select-none landscape:gap-2 landscape:py-2 ${
+          mode === 'fallback' ? 'is-fallback-fullscreen' : ''
+        }`}
+      >
+        <div className="fullscreen-button-wrap absolute top-0 right-0 z-20">
+          <FullscreenButton
+            isFullscreen={isFullscreen}
+            onToggle={() => {
+              void toggleFullscreen()
+            }}
+          />
+        </div>
+
+        <div className="game-layout flex w-full max-w-[100vw] items-stretch justify-center">
           {isPlaying && (
             <MobilePlayerControls
               player={1}
