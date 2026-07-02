@@ -20,6 +20,7 @@ export class GameEngine {
   private ctx: CanvasRenderingContext2D | null = null
   private listeners = new Set<StateListener>()
   private serveTimerStart: number | null = null
+  private pausedFrom: 'playing' | 'serving' | null = null
 
   setCanvasContext(ctx: CanvasRenderingContext2D): void {
     this.ctx = ctx
@@ -54,6 +55,7 @@ export class GameEngine {
   reset(): void {
     this.stop()
     this.serveTimerStart = null
+    this.pausedFrom = null
     this.state = createInitialState()
     this.notify()
     if (this.ctx) {
@@ -62,11 +64,19 @@ export class GameEngine {
   }
 
   togglePause(): void {
-    if (this.state.status === 'playing') {
+    if (
+      this.state.status === 'playing' ||
+      this.state.status === 'serving'
+    ) {
+      this.pausedFrom = this.state.status
       this.state = { ...this.state, status: 'paused' }
       this.notify()
     } else if (this.state.status === 'paused') {
-      this.state = { ...this.state, status: 'playing' }
+      this.state = {
+        ...this.state,
+        status: this.pausedFrom ?? 'playing',
+      }
+      this.pausedFrom = null
       this.notify()
     }
   }

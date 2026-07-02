@@ -11,38 +11,52 @@ const PLAYER2_KEYS: Record<string, PlayerInput> = {
   ArrowDown: 'down',
 }
 
-export function useGameInput(): () => Inputs {
+export type GameInputControls = {
+  getInputs: () => Inputs
+  setTouchInput: (player: 1 | 2, input: PlayerInput) => void
+}
+
+export function useGameInput(): GameInputControls {
   const inputsRef = useRef<Inputs>({
     player1: 'none',
     player2: 'none',
   })
+  const heldRef = useRef(new Set<string>())
+  const touchRef = useRef<Pick<Inputs, 'player1' | 'player2'>>({
+    player1: 'none',
+    player2: 'none',
+  })
+
+  const syncInputs = useCallback(() => {
+    inputsRef.current = {
+      player1: mergeInput(
+        resolveInput(heldRef.current, PLAYER1_KEYS),
+        touchRef.current.player1,
+      ),
+      player2: mergeInput(
+        resolveInput(heldRef.current, PLAYER2_KEYS),
+        touchRef.current.player2,
+      ),
+    }
+  }, [])
 
   useEffect(() => {
-    const held = new Set<string>()
-
-    const updateInputs = () => {
-      inputsRef.current = {
-        player1: resolveInput(held, PLAYER1_KEYS),
-        player2: resolveInput(held, PLAYER2_KEYS),
-      }
-    }
-
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.code in PLAYER1_KEYS || event.code in PLAYER2_KEYS) {
         event.preventDefault()
-        held.add(event.code)
-        updateInputs()
+        heldRef.current.add(event.code)
+        syncInputs()
       }
     }
 
     const onKeyUp = (event: KeyboardEvent) => {
-      held.delete(event.code)
-      updateInputs()
+      heldRef.current.delete(event.code)
+      syncInputs()
     }
 
     const onBlur = () => {
-      held.clear()
-      updateInputs()
+      heldRef.current.clear()
+      syncInputs()
     }
 
     window.addEventListener('keydown', onKeyDown)
@@ -54,9 +68,28 @@ export function useGameInput(): () => Inputs {
       window.removeEventListener('keyup', onKeyUp)
       window.removeEventListener('blur', onBlur)
     }
-  }, [])
+  }, [syncInputs])
 
-  return useCallback(() => inputsRef.current, [])
+  const getInputs = useCallback(() => inputsRef.current, [])
+
+  const setTouchInput = useCallback(
+    (player: 1 | 2, input: PlayerInput) => {
+      const key = player === 1 ? 'player1' : 'player2'
+      touchRef.current[key] = input
+      syncInputs()
+    },
+    [syncInputs],
+  )
+
+  return { getInputs, setTouchInput }
+}
+
+function mergeInput(
+  keyboard: PlayerInput,
+  touch: PlayerInput,
+): PlayerInput {
+  if (keyboard !== 'none') return keyboard
+  return touch
 }
 
 function resolveInput(

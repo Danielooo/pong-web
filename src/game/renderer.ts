@@ -58,7 +58,7 @@ function drawPausedOverlay(ctx: CanvasRenderingContext2D): void {
 
   ctx.font = '16px system-ui, sans-serif'
   ctx.fillStyle = '#a3a3a3'
-  ctx.fillText('Press Esc to resume', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30)
+  ctx.fillText('Tap Resume to continue', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30)
 }
 
 function drawGameOverOverlay(ctx: CanvasRenderingContext2D, winner: 1 | 2): void {
@@ -73,5 +73,5 @@ function drawGameOverOverlay(ctx: CanvasRenderingContext2D, winner: 1 | 2): void
 
   ctx.font = '16px system-ui, sans-serif'
   ctx.fillStyle = '#a3a3a3'
-  ctx.fillText('Press R to play again', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20)
+  ctx.fillText('Tap Play Again to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20)
 }

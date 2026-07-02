@@ -18,7 +18,13 @@ export function useGameShortcuts({
     if (!enabled) return
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'KeyR' && status === 'gameover') {
+      if (
+        event.code === 'KeyR' &&
+        (status === 'gameover' ||
+          status === 'paused' ||
+          status === 'playing' ||
+          status === 'serving')
+      ) {
         event.preventDefault()
         onRestart()
       }
