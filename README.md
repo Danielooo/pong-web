@@ -20,6 +20,8 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
+**Live:** [https://pong-web-puce.vercel.app](https://pong-web-puce.vercel.app)
+
 ## Controls
 
 | Player | Side | Up | Down |
