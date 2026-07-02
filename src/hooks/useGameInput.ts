@@ -1,20 +1,39 @@
 import { useCallback, useEffect, useRef } from 'react'
-import type { Inputs, PlayerInput } from '../game/types'
+import type { HorizontalInput, Inputs, PlayerInput, VerticalInput } from '../game/types'
 
-const PLAYER1_KEYS: Record<string, PlayerInput> = {
+const NO_INPUT: PlayerInput = { vertical: 'none', horizontal: 'none' }
+
+const PLAYER1_VERTICAL_KEYS: Record<string, VerticalInput> = {
   KeyW: 'up',
   KeyS: 'down',
 }
 
-const PLAYER2_KEYS: Record<string, PlayerInput> = {
+const PLAYER1_HORIZONTAL_KEYS: Record<string, HorizontalInput> = {
+  KeyA: 'left',
+  KeyD: 'right',
+}
+
+const PLAYER2_VERTICAL_KEYS: Record<string, VerticalInput> = {
   ArrowUp: 'up',
   ArrowDown: 'down',
 }
 
+const PLAYER2_HORIZONTAL_KEYS: Record<string, HorizontalInput> = {
+  ArrowLeft: 'left',
+  ArrowRight: 'right',
+}
+
+const ALL_GAME_KEYS = new Set([
+  ...Object.keys(PLAYER1_VERTICAL_KEYS),
+  ...Object.keys(PLAYER1_HORIZONTAL_KEYS),
+  ...Object.keys(PLAYER2_VERTICAL_KEYS),
+  ...Object.keys(PLAYER2_HORIZONTAL_KEYS),
+])
+
 export function useGameInput(): () => Inputs {
   const inputsRef = useRef<Inputs>({
-    player1: 'none',
-    player2: 'none',
+    player1: NO_INPUT,
+    player2: NO_INPUT,
   })
 
   useEffect(() => {
@@ -22,13 +41,13 @@ export function useGameInput(): () => Inputs {
 
     const updateInputs = () => {
       inputsRef.current = {
-        player1: resolveInput(held, PLAYER1_KEYS),
-        player2: resolveInput(held, PLAYER2_KEYS),
+        player1: resolvePlayerInput(held, PLAYER1_VERTICAL_KEYS, PLAYER1_HORIZONTAL_KEYS),
+        player2: resolvePlayerInput(held, PLAYER2_VERTICAL_KEYS, PLAYER2_HORIZONTAL_KEYS),
       }
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.code in PLAYER1_KEYS || event.code in PLAYER2_KEYS) {
+      if (ALL_GAME_KEYS.has(event.code)) {
         event.preventDefault()
         held.add(event.code)
         updateInputs()
@@ -59,10 +78,21 @@ export function useGameInput(): () => Inputs {
   return useCallback(() => inputsRef.current, [])
 }
 
-function resolveInput(
+function resolvePlayerInput(
   held: Set<string>,
-  keyMap: Record<string, PlayerInput>,
+  verticalKeys: Record<string, VerticalInput>,
+  horizontalKeys: Record<string, HorizontalInput>,
 ): PlayerInput {
+  return {
+    vertical: resolveAxisInput(held, verticalKeys),
+    horizontal: resolveAxisInput(held, horizontalKeys),
+  }
+}
+
+function resolveAxisInput<T extends string>(
+  held: Set<string>,
+  keyMap: Record<string, T>,
+): T | 'none' {
   for (const [code, input] of Object.entries(keyMap)) {
     if (held.has(code)) return input
   }

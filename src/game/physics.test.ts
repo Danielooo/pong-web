@@ -1,11 +1,21 @@
 import { describe, expect, it } from 'vitest'
-import { CANVAS_WIDTH } from './constants'
+import {
+  CANVAS_WIDTH,
+  LEFT_PADDLE_X_MAX,
+  RIGHT_PADDLE_X_MIN,
+} from './constants'
 import {
   createInitialState,
   frozenBallAtCenter,
   launchBall,
   tick,
 } from './physics'
+import type { Inputs } from './types'
+
+const NO_INPUT: Inputs = {
+  player1: { vertical: 'none', horizontal: 'none' },
+  player2: { vertical: 'none', horizontal: 'none' },
+}
 
 describe('physics', () => {
   it('creates a valid initial state', () => {
@@ -20,14 +30,50 @@ describe('physics', () => {
     const state = { ...createInitialState(), status: 'playing' as const }
     state.ball = launchBall()
     const startY = state.paddles[0].y
-    const next = tick(state, { player1: 'up', player2: 'none' })
+    const next = tick(state, {
+      ...NO_INPUT,
+      player1: { vertical: 'up', horizontal: 'none' },
+    })
     expect(next.paddles[0].y).toBeLessThan(startY)
+  })
+
+  it('moves the left paddle right on the X-axis', () => {
+    const state = { ...createInitialState(), status: 'playing' as const }
+    state.ball = launchBall()
+    const startX = state.paddles[0].x
+    const next = tick(state, {
+      ...NO_INPUT,
+      player1: { vertical: 'none', horizontal: 'right' },
+    })
+    expect(next.paddles[0].x).toBeGreaterThan(startX)
+  })
+
+  it('clamps left paddle X within its half of the court', () => {
+    const state = { ...createInitialState(), status: 'playing' as const }
+    state.ball = launchBall()
+    state.paddles[0].x = LEFT_PADDLE_X_MAX
+    const next = tick(state, {
+      ...NO_INPUT,
+      player1: { vertical: 'none', horizontal: 'right' },
+    })
+    expect(next.paddles[0].x).toBe(LEFT_PADDLE_X_MAX)
+  })
+
+  it('clamps right paddle X within its half of the court', () => {
+    const state = { ...createInitialState(), status: 'playing' as const }
+    state.ball = launchBall()
+    state.paddles[1].x = RIGHT_PADDLE_X_MIN
+    const next = tick(state, {
+      ...NO_INPUT,
+      player2: { vertical: 'none', horizontal: 'left' },
+    })
+    expect(next.paddles[1].x).toBe(RIGHT_PADDLE_X_MIN)
   })
 
   it('scores for player 2 when ball exits left and enters serving', () => {
     const state = { ...createInitialState(), status: 'playing' as const }
     state.ball = { ...frozenBallAtCenter(), x: -20, vx: 0, vy: 0 }
-    const next = tick(state, { player1: 'none', player2: 'none' })
+    const next = tick(state, NO_INPUT)
     expect(next.scores).toEqual([0, 1])
     expect(next.status).toBe('serving')
     expect(next.ball.vx).toBe(0)
@@ -39,7 +85,7 @@ describe('physics', () => {
     const state = { ...createInitialState(), status: 'playing' as const }
     state.scores = [10, 0]
     state.ball = { ...frozenBallAtCenter(), x: CANVAS_WIDTH + 1, vx: 0, vy: 0 }
-    const next = tick(state, { player1: 'none', player2: 'none' })
+    const next = tick(state, NO_INPUT)
     expect(next.status).toBe('gameover')
     expect(next.winner).toBe(1)
   })
@@ -47,7 +93,10 @@ describe('physics', () => {
   it('is a no-op when paused', () => {
     const state = { ...createInitialState(), status: 'paused' as const }
     state.ball = launchBall()
-    const next = tick(state, { player1: 'up', player2: 'down' })
+    const next = tick(state, {
+      player1: { vertical: 'up', horizontal: 'none' },
+      player2: { vertical: 'down', horizontal: 'none' },
+    })
     expect(next).toEqual(state)
   })
 
@@ -60,7 +109,7 @@ describe('physics', () => {
       vy: 0,
     }
     const beforeSpeed = Math.hypot(state.ball.vx, state.ball.vy)
-    const next = tick(state, { player1: 'none', player2: 'none' })
+    const next = tick(state, NO_INPUT)
     const afterSpeed = Math.hypot(next.ball.vx, next.ball.vy)
     expect(afterSpeed).toBeGreaterThan(beforeSpeed)
     expect(next.ball.vx).toBeGreaterThan(0)

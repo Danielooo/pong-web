@@ -1,6 +1,12 @@
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'serving' | 'gameover'
 
-export type PlayerInput = 'up' | 'down' | 'none'
+export type VerticalInput = 'up' | 'down' | 'none'
+export type HorizontalInput = 'left' | 'right' | 'none'
+
+export type PlayerInput = {
+  vertical: VerticalInput
+  horizontal: HorizontalInput
+}
 
 export type Inputs = {
   player1: PlayerInput

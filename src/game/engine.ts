@@ -14,8 +14,8 @@ export class GameEngine {
   private state: GameState = createInitialState()
   private animationId: number | null = null
   private getInputs: () => Inputs = () => ({
-    player1: 'none',
-    player2: 'none',
+    player1: { vertical: 'none', horizontal: 'none' },
+    player2: { vertical: 'none', horizontal: 'none' },
   })
   private ctx: CanvasRenderingContext2D | null = null
   private listeners = new Set<StateListener>()
