@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { GameCanvas } from './components/GameCanvas'
 import { GameControls } from './components/GameControls'
-import { MobileControls } from './components/MobileControls'
+import { MobilePlayerControls } from './components/MobileControls'
 import { ScoreBoard } from './components/ScoreBoard'
 import { StartScreen } from './components/StartScreen'
 import { useGameInput } from './hooks/useGameInput'
@@ -58,28 +58,36 @@ export default function App() {
         </div>
       </div>
 
-      <main className="game-shell flex min-h-[100dvh] flex-col items-center justify-center gap-3 p-3 landscape:gap-2 landscape:p-2">
-        <div className="flex w-full max-w-[900px] flex-col items-center gap-3 landscape:max-w-none landscape:gap-2">
+      <main className="game-shell flex min-h-[100dvh] flex-col items-center justify-center gap-3 py-3 landscape:gap-2 landscape:py-2">
+        <div className="game-layout flex w-full max-w-[100vw] items-center justify-center">
+          {isPlaying && (
+            <MobilePlayerControls
+              player={1}
+              onTouchInput={setTouchInput}
+              disabled={controlsDisabled}
+            />
+          )}
+
           <div
             ref={containerRef}
-            className="game-board relative aspect-[4/3] w-full max-h-[min(600px,calc(100dvh-7rem))] max-w-[800px] landscape:max-h-[calc(100dvh-5rem)] landscape:max-w-[min(900px,calc(100vw-1rem))]"
+            className={
+              isPlaying
+                ? 'relative flex min-h-0 flex-1 items-center justify-center self-stretch max-h-[calc(100dvh-5.5rem)]'
+                : 'relative flex aspect-[4/3] w-full max-w-[min(800px,calc(100vw-2rem))] items-center justify-center'
+            }
           >
-            <GameCanvas
-              canvasRef={canvasRef}
-              className={phase === 'menu' ? 'hidden' : ''}
-            />
-            {isPlaying && state && (
-              <>
+            <div className="relative inline-flex items-center justify-center">
+              <GameCanvas
+                canvasRef={canvasRef}
+                className={phase === 'menu' ? 'hidden' : ''}
+              />
+              {isPlaying && state && (
                 <ScoreBoard
                   leftScore={state.scores[0]}
                   rightScore={state.scores[1]}
                 />
-                <MobileControls
-                  onTouchInput={setTouchInput}
-                  disabled={controlsDisabled}
-                />
-              </>
-            )}
+              )}
+            </div>
 
             {phase === 'menu' && (
               <div className="absolute inset-0 flex items-center justify-center overflow-y-auto px-2">
@@ -89,15 +97,23 @@ export default function App() {
           </div>
 
           {isPlaying && (
-            <GameControls
-              status={status}
-              onPause={togglePause}
-              onResume={togglePause}
-              onRestart={handlePlayAgain}
-              onBackToMenu={handleBackToMenu}
+            <MobilePlayerControls
+              player={2}
+              onTouchInput={setTouchInput}
+              disabled={controlsDisabled}
             />
           )}
         </div>
+
+        {isPlaying && (
+          <GameControls
+            status={status}
+            onPause={togglePause}
+            onResume={togglePause}
+            onRestart={handlePlayAgain}
+            onBackToMenu={handleBackToMenu}
+          />
+        )}
       </main>
     </>
   )

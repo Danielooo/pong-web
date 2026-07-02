@@ -1,7 +1,8 @@
 import type { PointerEvent } from 'react'
 import type { PlayerInput } from '../game/types'
 
-type MobileControlsProps = {
+type MobilePlayerControlsProps = {
+  player: 1 | 2
   onTouchInput: (player: 1 | 2, input: PlayerInput) => void
   disabled?: boolean
 }
@@ -37,50 +38,37 @@ function ArrowButton({ label, direction, onPress, disabled }: ArrowButtonProps) 
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
       onPointerLeave={handlePointerUp}
-      className="flex h-14 w-14 items-center justify-center rounded-full border border-neutral-600/80 bg-neutral-900/80 text-2xl text-white shadow-lg backdrop-blur-sm transition active:scale-95 active:bg-neutral-700 disabled:opacity-40 landscape:h-12 landscape:w-12 landscape:text-xl touch-none select-none"
+      className="flex h-[4.75rem] w-[4.75rem] items-center justify-center rounded-full border-2 border-neutral-500/80 bg-neutral-900/90 text-4xl text-white shadow-xl backdrop-blur-sm transition active:scale-95 active:bg-neutral-700 disabled:opacity-40 landscape:h-20 landscape:w-20 landscape:text-[2.5rem] touch-none select-none"
     >
       {direction === 'up' ? '↑' : '↓'}
     </button>
   )
 }
 
-type PlayerPadProps = {
-  player: 1 | 2
-  onTouchInput: (player: 1 | 2, input: PlayerInput) => void
-  disabled?: boolean
-}
-
-function PlayerPad({ player, onTouchInput, disabled }: PlayerPadProps) {
+export function MobilePlayerControls({
+  player,
+  onTouchInput,
+  disabled,
+}: MobilePlayerControlsProps) {
   const handlePress = (input: PlayerInput) => {
     onTouchInput(player, input)
   }
 
   return (
-    <div className="flex flex-col gap-3 landscape:gap-2">
-      <ArrowButton
-        label={`Player ${player} move up`}
-        direction="up"
-        onPress={handlePress}
-        disabled={disabled}
-      />
-      <ArrowButton
-        label={`Player ${player} move down`}
-        direction="down"
-        onPress={handlePress}
-        disabled={disabled}
-      />
-    </div>
-  )
-}
-
-export function MobileControls({ onTouchInput, disabled }: MobileControlsProps) {
-  return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-3 landscape:px-2">
-      <div className="pointer-events-auto">
-        <PlayerPad player={1} onTouchInput={onTouchInput} disabled={disabled} />
-      </div>
-      <div className="pointer-events-auto">
-        <PlayerPad player={2} onTouchInput={onTouchInput} disabled={disabled} />
+    <div className="touch-controls flex w-[5.5rem] shrink-0 flex-col items-center justify-center landscape:w-[6.5rem]">
+      <div className="flex flex-col gap-8 landscape:gap-10">
+        <ArrowButton
+          label={`Player ${player} move up`}
+          direction="up"
+          onPress={handlePress}
+          disabled={disabled}
+        />
+        <ArrowButton
+          label={`Player ${player} move down`}
+          direction="down"
+          onPress={handlePress}
+          disabled={disabled}
+        />
       </div>
     </div>
   )

@@ -14,6 +14,30 @@ body {
   min-height: 100dvh;
 }
 
+.game-layout {
+  gap: 1.25rem;
+  padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+}
+
+@media (orientation: landscape) {
+  .game-layout {
+    gap: 2rem;
+    padding-left: max(1.75rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.75rem, env(safe-area-inset-right, 0px));
+  }
+}
+
+.touch-controls {
+  display: flex;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .touch-controls {
+    display: none;
+  }
+}
+
 @media (orientation: portrait) and (max-width: 768px) {
   .portrait-warning {
     display: flex;
@@ -25,7 +49,7 @@ body {
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-  .game-board {
-    max-height: calc(100dvh - 4rem);
+  .game-layout {
+    gap: 1.5rem;
   }
 }

@@ -9,7 +9,7 @@ export function GameCanvas({ canvasRef, className = '' }: GameCanvasProps) {
   return (
     <canvas
       ref={canvasRef}
-      className={`rounded-lg border border-neutral-800 shadow-2xl ${className}`}
+      className={`block rounded-lg border border-neutral-800 shadow-2xl ${className}`}
       aria-label="Pong game board"
     />
   )
