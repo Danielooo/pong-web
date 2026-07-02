@@ -12,7 +12,7 @@ body {
 }
 
 #root {
-  min-height: 100dvh;
+  min-height: var(--visual-viewport-height, 100dvh);
 }
 
 .game-shell {
@@ -20,13 +20,16 @@ body {
   user-select: none;
 }
 
-.game-shell.is-fallback-fullscreen {
+.game-shell.is-fallback-fullscreen,
+.game-shell.is-standalone {
   position: fixed;
-  inset: 0;
+  top: var(--visual-viewport-offset-top, 0px);
+  left: var(--visual-viewport-offset-left, 0px);
   z-index: 9999;
-  min-height: 100dvh;
-  min-width: 100vw;
-  width: 100vw;
+  width: var(--visual-viewport-width, 100vw);
+  height: var(--visual-viewport-height, 100dvh);
+  min-width: var(--visual-viewport-width, 100vw);
+  min-height: var(--visual-viewport-height, 100dvh);
   background-color: #0a0a0a;
   padding-top: env(safe-area-inset-top, 0px);
   padding-right: env(safe-area-inset-right, 0px);

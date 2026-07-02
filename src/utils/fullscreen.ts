@@ -7,8 +7,13 @@ type FullscreenDocument = Document & {
   msExitFullscreen?: () => Promise<void> | void
 }
 
+type NativeFullscreenOptions = {
+  navigationUI?: 'auto' | 'hide' | 'show'
+}
+
 type FullscreenElement = HTMLElement & {
-  webkitRequestFullscreen?: () => Promise<void> | void
+  requestFullscreen?: (options?: NativeFullscreenOptions) => Promise<void>
+  webkitRequestFullscreen?: (options?: NativeFullscreenOptions) => Promise<void>
   mozRequestFullScreen?: () => Promise<void> | void
   msRequestFullscreen?: () => Promise<void> | void
 }
@@ -47,6 +52,8 @@ export function isNativeFullscreenSupported(): boolean {
   )
 }
 
+const FULLSCREEN_OPTIONS: NativeFullscreenOptions = { navigationUI: 'hide' }
+
 export async function requestNativeFullscreen(
   element: HTMLElement,
 ): Promise<boolean> {
@@ -54,11 +61,11 @@ export async function requestNativeFullscreen(
 
   try {
     if (typeof target.requestFullscreen === 'function') {
-      await target.requestFullscreen()
+      await target.requestFullscreen(FULLSCREEN_OPTIONS)
       return true
     }
     if (typeof target.webkitRequestFullscreen === 'function') {
-      await target.webkitRequestFullscreen()
+      await target.webkitRequestFullscreen(FULLSCREEN_OPTIONS)
       return true
     }
     if (typeof target.mozRequestFullScreen === 'function') {
